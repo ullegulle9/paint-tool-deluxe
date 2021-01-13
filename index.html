@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100%;
+    }
+
+    * {
+
+      box-sizing: border-box;
+      text-transform: uppercase;
+      color: bisque;
+      font-family: monospace;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+      background-color: crimson;
+      text-shadow: 1px 1px 2px black;
+      font-size: 40px;
+      border-bottom: 2px solid bisque;
+      text-transform: uppercase;
+    }
+
+    aside {
+      position: absolute;
+      right: 0px;
+      top: 68px;
+      width: 20px;
+      /* border: 2px solid lime; */
+      height: calc(100vh - 68px);
+      background-color: rgba(114, 114, 114, .7);
+      transition: width 0.5s ease-in-out;
+      overflow: hidden;
+    }
+
+    .tools {
+      transform: translateX(100px);
+      transition: transform .7s linear;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .tools > div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .tools > div > span {
+      padding: 8px 0;
+      text-align: center;
+    }
+
+    aside:hover {
+      width: 70px;
+    }
+    aside:hover > .tools {
+      transform: translateX(0px);
+    }
+
+    .range-input {
+      width: 50px;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="header">Paint tool deluxe</div>
+  <canvas id="canvas" width="800" height="800"></canvas>
+  <aside>
+    <div class="tools">
+      <div>
+        <span>Select color</span>
+        <input class="color-input" type="color">
+      </div>
+      <div>
+        <span>Select width</span>
+        <input class="range-input" type="range">
+      </div>
+    </div>
+  </aside>
+</body>
+<script>
+  function initialize() {
+    const canvas = document.querySelector('#canvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.querySelector('.color-input');
+    const widthInput = document.querySelector('.range-input');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    colorPicker.defaultValue = '#ed143d';
+
+    console.log(window.innerWidth);
+
+    ctx.strokeStyle = 'crimson'; 
+    ctx.lineJoin = 'round'; 
+    ctx.lineCap = 'round'; 
+    ctx.lineWidth = 50;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let isDrawing = false;
+    let startX = 0;
+    let startY = 0;
+
+    const draw = ({offsetX, offsetY}) => {
+      if (!isDrawing) return;
+      console.log({offsetY, offsetX});
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(offsetX, offsetY);
+      // ctx.closePath();
+      ctx.stroke();
+      [startX, startY] = [offsetX, offsetY];
+    }
+
+    canvas.addEventListener('mousemove', draw)
+    canvas.addEventListener('mousedown', ({offsetX, offsetY}) => {
+      isDrawing = true;
+      [startX, startY] = [offsetX, offsetY];
+    })
+    canvas.addEventListener('mouseup', () =>   isDrawing = false );
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    console.log({colorPicker});
+
+    colorPicker.addEventListener('input', e => {
+      ctx.strokeStyle = e.target.value;
+    })
+
+    widthInput.addEventListener('input', e => {
+      console.log(e.target.value);
+      ctx.lineWidth = e.target.value;
+    })
+  }
+
+  initialize();
+
+  
+
+  // const reportWindowSize = e => {
+  //   console.log(window.innerWidth, window.innerHeight);
+  //   canvas.width = window.innerWidth;
+  //   canvas.height = window.innerHeight;
+  // }
+
+  window.addEventListener('resize', initialize);
+
+</script>
+</html>
